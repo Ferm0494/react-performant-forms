@@ -4,7 +4,7 @@
   "private": false,
   "author": "Ferm0494",
   "keywords": ["react","react-forms","rerenderings","many-form-inputs","performant-inputs","form-state-handler"],
-  "main": "dist",
+  "main": "dist/index.ts",
   "module": "dist",
   "files":["dist","README.md"],
   "repository":{
