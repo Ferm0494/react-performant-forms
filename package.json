@@ -1,6 +1,6 @@
 {
   "name": "ferm-forms",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": false,
   "author": "Ferm0494",
   "keywords": ["react","react-forms","rerenderings","many-form-inputs","performant-inputs","form-state-handler"],
