@@ -10,6 +10,6 @@ export const DebouncedTextInput = (props: IDebouncedInputProps) => {
 };
 /* We are not using debounce we can store our state value into the value prop  */
 export const NonDebouncedTextInput = (props:React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> ) => {
-    return <input  type="text" {...props} />;
+    return <input type="text" {...props} />;
 };
 
