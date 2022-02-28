@@ -1,13 +1,13 @@
 {
   "name": "ferm-forms",
-  "version": "0.3.2",
+  "version": "0.3.5",
   "private": false,
   "author": "Ferm0494",
-  "keywords": ["react","react-forms","rerenderings","many-form-inputs","performant-inputs","form-state-handler"],
+  "keywords": ["react", "react-forms", "rerenderings", "many-form-inputs", "performant-inputs", "form-state-handler"],
   "main": "dist/index.ts",
   "module": "dist",
-  "files":["dist","README.md"],
-  "repository":{
+  "files": ["dist", "README.md"],
+  "repository": {
     "type": "git",
     "url": "git+https://github.com/Ferm0494/ferm-forms.git"
   },
