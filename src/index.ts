@@ -1,4 +1,4 @@
-import useForm  from '../src/hooks'
+import useForm  from './hooks'
 
 export {
   useForm
