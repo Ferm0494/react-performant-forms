@@ -22,5 +22,6 @@
 
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist", "example", "rollup.config.js"]
+  "exclude": ["node_modules", "dist", "example", "rollup.config.js","src/**/tests",
+    "src/**/*.test.ts",]
 }
