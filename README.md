@@ -1,5 +1,7 @@
 # useForm hook.
 
+`import {useForm} from 'react-performant-forms'`
+
 ## Why was it created ?
 
 This hook is created to control inputs in a parent component, with less code boilerplate & optimize rerenders as possible, we normally do something like this when we create a form.
@@ -352,7 +354,8 @@ return(
 
 ## Questions ?
 
-Feel free to ping @Slack => Fernando Rivas.
+1- Submitting a PR: Please add tests to your code in a separate branch.
+2- Issues? Feel free to submit any issue on the issue section :https://github.com/Ferm0494/ferm-forms/issues
 
 
 
