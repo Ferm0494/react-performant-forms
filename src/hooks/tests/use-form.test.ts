@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react-hooks';
-import useForm from '../useForm';
+import useForm from './'
 const TEST_CHANGE = 'TEST-CHANGE';
 const mockMultipleFieldsChangeHandler = (state) => ({
   field1: 'Changing',
@@ -89,12 +89,12 @@ describe('use-form', () => {
     expect(field4.error).toBeTruthy();
   });
 
-  it('should put error flag to true  in field if validator field returns false & we have a non empty value in field, and isValidForm called', () => {
-    const mockValidator = () => false;
+  it('should put error flag to true  in field if checkFieldErrors field returns true & we have a non empty value in field, and isValidForm called', () => {
+    const mockcheckFieldErrors = () => true;
     mockInputValues.fields.field1 = {
       ...mockInputValues.fields.field1,
       value: 'not-empty-str',
-      validator: mockValidator,
+      checkFieldErrors: mockcheckFieldErrors,
     };
     const { result } = renderHook(() => useForm(mockInputValues));
     act(() => {
@@ -102,6 +102,24 @@ describe('use-form', () => {
     });
 
     expect(result.current.state.field1.error).toBeTruthy();
+  });
+
+  it('should put error flag to true & error_message key change with the returning value of checkFieldErrors, if checkFieldErrors field returns a string',()=>{
+    const MOCK_ERROR_MESSAGE = 'RANDOM_STRING'
+    const mockcheckFieldErrors = ()=> MOCK_ERROR_MESSAGE
+    mockInputValues.fields.field1 = {
+      ...mockInputValues.fields.field1,
+      value: 'not-empty-str',
+      checkFieldErrors: mockcheckFieldErrors,
+    };
+    const { result } = renderHook(() => useForm(mockInputValues));
+    act(() => {
+      result.current.isValidForm();
+    });
+
+    expect(result.current.state.field1.error).toBeTruthy();
+    expect(result.current.state.field1.errorMessage).toEqual(MOCK_ERROR_MESSAGE);
+
   });
 
   it('should put error flag to false if error flag is true, after we call our handler for a specific field', () => {
@@ -170,4 +188,15 @@ describe('use-form', () => {
       expect(result.current.state.field1.errorMessage).toEqual(NEW_ERROR_MESSAGE);
     },
   );
+  it('resetForm should be able to override field values with key-match',()=>{
+    const {result} = renderHook(()=>useForm(mockInputValues));
+    const mockMsg = 'TESTING-FIELD-VALUE'
+    act(()=>{
+      result.current.replaceForm({
+          ...result.current.state,
+          field1: mockMsg,
+      });
+    });
+    expect(result.current.state.field1.value).toEqual(mockMsg);
+  })
 });

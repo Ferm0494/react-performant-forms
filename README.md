@@ -1,113 +1,358 @@
-# A simple hook with customized raw components to handle performant inputs on React :) 
-## (Only working for Text components) Work in progress!
+# useForm hook.
 
-# What this solves?
- - We can have a big form with a nice UI that looks awesome but how is the UX?, however when we have big forms we normally do something like this on React:
- 
- ## Example:
- **State Declaration:**
- <br/>
- <br/>
- `const [body,setBodyForm] = useState({
-    field1: '',
-    field2: '',
-    field3: '',
-    .
-    .
-    .
-    .
- })`
- 
-**Handlers**
-<br/>
-<br/>
-`
-const handleField1= (e)=>{
-  .
-  .
-  .
-  setBodyForm({...body,field1: e.target.value})
-}
-`
-<br/>
-`
-const handleField2 = (e)=>{
-  .
-  .
-  .
-  setBodyForm({...body,field2: e.target.value})
-}
-`
-<br/>
-<br/>
--So whats the issue? The issue since we are changing the state... Since we are modifying a field and setting a new object into our state our whole parent component renders causing our children to re-render because they receive new handlers, since our parent component is *re-rendering*
-<br/>
+## Why was it created ?
 
-Alternative: We can ofc `useCallback()` hook, but what will be our array of dependencies? `[]` it must be [body] but again this wont work... since everytime our component changes, it will create a new isntance of body and again same return point.
-
-## Solution
-
-- With `useForm` Hook we got this covered, since we can have 2 types of inputs *debounced* - *non-debounced* Read more here about [Debounce](https://lodash.com/docs/4.17.15#debounce):
-
-**Example**
+This hook is created to control inputs in a parent component, with less code boilerplate & optimize rerenders as possible, we normally do something like this when we create a form.
+<br>
+<br>
+**Example:**
 ```
-import {useForm} from 'ferm-forms/hooks'
-import {NonDebouncedInput,DebouncedInput} from 'ferm-forms/components;
-
-const ParentComponent = ()=>{
-const {mapper} = useForm({
-<!-- Value is our initial Value it can be any other value in this case is empty -->
-  field1:{value: '', onChange: handleField1Change }
-  field2:{value:'', onChange: handleField2Change, withInputValue: true }
-  field3:{value:''}
-  .
-  .
-  .
+const [form,setForm] = useState({
+  field1: '',
+  field2: ''
 })
 
-const handleField1 = (value, setValue)=>{
-    console.log("We got our fresh value here",value) IMPORTANT: SINCE FIELD1 IS DEBOUNCED WE MUST SET INTO OUR STATE with setValue();
-     setValue(value)
+const [errors,setErrors] = useState({
+  field1: false,
+  field2: true
+}); 
+
+const handleField1Change = (value)=>{
+   setForm({...form, field1: value);
+}   
+/* THIS IS SOME RANDOM LOGIC BASED ON FIELD1 STATE VALUE */
+const handleField2Change = (value)=>{
+  const field2 =  value.toUpperCase();
+  if(!field1){
+    setForm({field1: value, field2})
+  }else{
+  } setForm({..form,field2})
 }
 
-const handleField2 = (value,setValue)=>{
-  <!-- No need for dispatcher, we already have our value into our mapper -->
-  console.log("We have our NonDebounced value",value)
+const handleSubmit = (e)=>{
+  if(!field1 || !field2){
+    setErrors({
+      field1: !field1,
+      field2: !field2,
+    })
+    return;
+  }
+.
+.
+.
+
 }
 return(
-  <div>
-      <!-- IF WE ARE USING DEBOUNCED INPUT WE CANT HAVE VALUE PROP THIS IS DUE BECAUSE WE GET IT AFTER 500MS ON OUR HANDLER! DONT FORGET TO SET IT IT setValue -->
-        <DebouncedInput onChange={mapper.field1.onChange} />
-      <!--   IF FOR SOME CASE WE NEEED THE VALUE KEEP IN MIND OUR PARENT COMPONENT WILL RENDER, BUT NOT CHILDREN :), DUE TO NEW STATE   -->
-        <NonDebouncedInput value={mapper.field2.value}  onChange={mapper.field2.onChange} />
-      <!--  NO USELESS HANDLERS: EG: onChange={(e)=> setField3(e.target.value)}   READ: VALUE PROP IS OPTIONA  -->
-      <NonDebouncedInput  onChange={mapper.field3.onChange} />
-
-   
-  </div>
+    <form onSubmit={hanldeSubmit}>
+      <Input type="text" onChange={handleField1Change} value={form.field1}/>
+      <Input type="text" onChange={handleField2Change} value={form.field2} />
+      <button type="submit">Submit</button>
+    </form>
 )
+```
+
+**Context**:  So whats happening here? Whats happening is that if our `field1 || field2` changes our whole form gets to render, due to the state change in our parent component contatining our inputs, of course we can use `memo` in our children components, but that wont simply work due to the new instances in our handlers being created everytime our parent gets to re-render. So even if one input changes, our whole inputs will change disregarding if they have `memo`
+
+**Alternative**
+<br>
+*Can't we just use useCallback  & memo*?
+<br>
+- The short answer is **no**, since in some cases we need access to the state form values, and since this is the case... we must include the depending fields that we are going to use in our dependency array in our `useCallback()`, so we get back to the previous point where we get if one of our field in our dependency changes... the callback will be recreated, and again it will re-render whenever this callback is being used. Disregarding if your input changed or not.
+
+# How to solve it with useHook ?
+- Pretty much the idea of the useHook is to summarize form actions which involves:
+1. Change Handlers being summarized as memoized dispatchers ( So we can use `memo` )
+2. Field Values.
+3. Error Handlers
+4. Submit Handlers
+5. Blur Handlers
+6. Validation callbacks
+7. Error Flags.
+8. Error Messages
+
+# How to use it ?
+
+- Declare the hook and the fields you are going to use in your **form** it can be any type for this case Im going to use text fields.
+```
+const {state,handlers,handleSubmit} = useForm({
+  fields:{
+    field1:{value:'Initial value for field1'}
+    field2: {value: '' }
+  }
+  onSubmit:(values)=>{
+    console.log(values)
+  <!-- You should be seeing the state values for field1 and field2-->
+  }
+});
+
+return(
+  <form onSubmit={handleSubmit}>
+    <Input type="text" onChange={handlers.field1} value={state.field1}/>
+    <Input type="text" onChange={handlers.field2} value={state.field2} />
+    <button type="submit>Submit</button>
+  </form>
+)
+```
+Thats it, you created a simple form in a single *JSON* and the good thing is that you can `memo` your inputs components and they wont re-render disregarding if the other 1 changed, due that you are handling via a memoized dispatcher callback
+<br>
+
+# Adding Custom Handlers for extra logic in our Fields.
+
+- We can add a custom handler to handle logic into our field for example any transformation or pasing that it may need, it can surely be added with the key *onChange* in our respective field prop we are interested, once we are done with the logic it's just simple enough to *return* it to set into the inner state of our *useForm hook*.
+
+```
+const handleField2Change = (valueofField2)=>{
+<!-- JUST A SIMPLE LOGIC  -->
+  return valueOfField2.trim();
+}
+const {state,handlers,handleSubmit} = useForm({
+  fields:{
+    field1:{value:'Initial value for field1'}
+    field2: {value: '', onChange: handleField2Change }
+  }
+  onSubmit:(values)=>{
+    console.log(values)
+  <!-- You should be seeing the state values for field1 and field2-->
+  }
+});
+
+return(
+  <form onSubmit={handleSubmit}>
+    <Input type="text" onChange={handlers.field1} value={state.field1}/>
+    <Input type="text" onChange={handlers.field2} value={state.field2} />
+    <button type="submit">Submit</button>
+  </form>
+)
+```
+# Accessing other values of our forms into our handlers.
+
+Cant I just simply use the *state* prop from `useForm` ? Short answer: *NO* ,since they are memoized, you will only get the field fresh to the connected handler, however the rest will remain to their **initial state** .
+
+## SOLUTION: 
+```
+const handleField2Change = (field2Value,state)=>{
+const {field2,field1} = state
+<!-- field2 and field here we get our current states for field1 && field2 -->
+.
+.
+.
 }
 ```
-## Important :
-- Keep in mind if we want to use Debounce we must sent a **handler** callback with `<DebouncedInput/>` component, if we need a **handler** and **value** prop we must use `<NonDebouncedInput/>` component  with
-`withInputValue: true` on `useForm`
-- If you are using Debounce Inputs keep in mind you need to set the state with second argument `setValue()`
+# Setting Multiple fields state in a single handler
 
-# Getting our Input values:
- - We have 2 alternatives:
- 1. Get them separetely with our mapper: mapper.field1.value 
- 2. Get them all at once with our callback `getValues()` this is normally used **onSubmit** action.
- EG: 
- ```
- const {mapper, getValues} = useForm({...})
- .
- .
- .
- const handleSubmit = ()=>{
-  const body = getValues()
-  console.log(body);
-  OUTPUT:
-  <!--{field1: ${value}, field2: ${value}, field3: ${value}}-->
- }
- ```
-## Got more Ideas Feel free to contribute in another branch and submit a PR :)
+Let's say you want to return a new state for your field1 based on field2 as well set the new value for field2 in your `handleField2Change`
+
+## SOLUTION:
+
+```
+const handleField2Change = (field2Value,state)=>{
+  const {field2,field1} = state;
+  return{field1: field2, field2: field2Value}
+}
+```
+By just returning an object with the corresponding keys, the `useForm` hook will set the state values for those corresponding keys.
+<br>
+<br>
+IMPORTANT: Keep in mind that those keys needs to be defined in our `fields` prop in our `useForm` hook, the reason for this is to not add thrash and keep our form well defined from the beginning.
+
+# Controlling Events in our Handler:
+```
+const handleField2Change = (field2Value,state,event)=>{
+.
+.
+.
+}
+```
+
+# Validations & Errors.
+
+We can handle errors and validations within our `JSON` config `useForm`,
+## Getting started 
+```
+const {state,handleSubmit} = useForm({
+  fields:{
+    field1:{value:'Initial value for field1',error: false, errorMessage: 'SOME_DEFAULT_ERROR_MESSAGE_FIELD1'}
+    field2: {value: '' , error: false, errorMessage: 'SOME_DEFAULT_ERROR_MESSAGE_FIELD2'}
+  }
+  onSubmit:(values)=>{
+    console.log(values)
+  <!-- You should be seeing the state values for field1 and field2-->
+  }
+});
+
+return(
+  <form onSubmit={handleSubmit}>
+    <Input type="text" onChange={handlers.field1} value={state.field1} error={state.field1.error} errorMessage={state.field1.errorMessage}/>
+    <Input type="text" onChange={handlers.field2} value={state.field2} error={state.field2.error} errorMessage={state.field2.errorMessage}/>
+    <button type="submit">Submit</button>
+  </form>
+);
+```
+1. `error` : is the state of our error field we initialized as false.
+2. `errorMessage`: is the defaultErrorMessage that will pop when we trigger a validation.
+
+## Triggering Errors and Changing Error Messages in our Fields.
+- Triggering Error Fields:
+```
+const {state,handlers,isValidForm,handleSubmit} = useForm({
+  fields:{
+    field1:{value:'Initial value for field1',error: false, errorMessage: 'SOME_DEFAULT_ERROR_MESSAGE_FIELD1',checkFieldErrors: ()=> true}
+    field2: {value: '' , error: false, errorMessage: 'SOME_DEFAULT_ERROR_MESSAGE_FIELD2', checkFieldErrors: ()=> true}
+  }
+  onSubmit:(values)=>{
+  <!-- You should be seeing the state values for field1 and field2-->
+  console.log(values);  
+  <!-- NEEDED: In order to trigger each checkErrorFields callback for each field  -->
+  if(isValidForm()){
+  <!--  since each of our checkErrorFields is returning true isValidForm() will return true    -->
+  console.log("our form has some errors")
+  }
+  }
+});
+
+return(
+  <form onSubmit={handleSubmit}>
+    <Input type="text" onChange={handlers.field1} value={state.field1} error={state.field1.error} errorMessage={state.field1.errorMessage}/>
+    <Input type="text" onChange={handlers.field2} value={state.field2} error={state.field2.error} errorMessage={state.field2.errorMessage}/>
+    <button type="submit">Submit</button>
+  </form>
+);
+```
+1. `isValidForm()`: Is our helper callback that will check every `checkFieldErrors` of our fields if **ONE OF THEM RETURNS TRUE**, `isValidForm` will **return FALSE**
+2. `checkFieldErrors`: Is a prop that needs `error` prop to be DEFINED,it validates the field for our specific needs, if it returns true, the `error` defined in our field prop will be set up to **true**, and `isValidForm()` will return **false** when executed.
+<br>
+NOTE: Please keep in mind that `error` prop is attached to the `checkFieldErrors` and `checkFieldErrors` gets executed when we call `isValidForm()`
+
+- Changing Default Error Messages within our Fields:
+
+```
+const {state,handlers,isValidForm,handleSubmit} = useForm({
+  fields:{
+    field1:{value:'Initial value for field1',error: false, errorMessage: 'SOME_DEFAULT_ERROR_MESSAGE_FIELD1',checkFieldErrors: ()=> 'INVALID_MSG1'}
+    field2: {value: '' , error: false, errorMessage: 'SOME_DEFAULT_ERROR_MESSAGE_FIELD2', checkFieldErrors: ()=> 'INVALID_MSG2'}
+  }
+  onSubmit:(values)=>{
+  <!-- You should be seeing the state values for field1 and field2-->
+  console.log(values);  
+  <!-- NEEDED: In order to trigger each checkErrorFields callback for each field  -->
+  if(isValidForm()){
+  <!--  since each of our checkErrorFields is returning true isValidForm() will return true    -->
+  console.log("our form has some errors")
+  }
+  }
+});
+
+return(
+  <form onSubmit={handleSubmit}>
+    <Input type="text" onChange={handlers.field1} value={state.field1} error={state.field1.error} errorMessage={state.field1.errorMessage}/>
+    <Input type="text" onChange={handlers.field2} value={state.field2} error={state.field2.error} errorMessage={state.field2.errorMessage}/>
+    <button type="submit">Submit</button>
+  </form>
+);
+```
+- If `checkFieldErrors` returns a string it means that's is  the error string message we want to display when executing `isValidForm()`, so our `errorMessage` will have the returning string value of the `checkFieldErrors`.
+
+NOTE: IMPORTANT Once we show the returning string of `checkFieldErrors` once we change the value of that field via our `handler` , `errorMessage` will have the value we initialized it.
+
+## Sever Errors
+- We normally want to check if our server is returning a valid request or not, is our request is invalid based on server validation and we want to display which fields failed we can do that with our helper: `onError`
+
+```
+const {state,handlers,isValidForm,handleSubmit,handleErrors} = useForm({
+  fields:{
+    field1:{value:'Initial value for field1',error: false, errorMessage: 'SOME_DEFAULT_ERROR_MESSAGE_FIELD1',checkFieldErrors: ()=> 'INVALID_MSG1'}
+    field2: {value: '' , error: false, errorMessage: 'SOME_DEFAULT_ERROR_MESSAGE_FIELD2', checkFieldErrors: ()=> 'INVALID_MSG2'}
+  }
+  onSubmit:(values)=>{
+  <!-- You should be seeing the state values for field1 and field2-->
+  console.log(values);  
+  <!-- NEEDED: In order to trigger each checkErrorFields callback for each field  -->
+  if(isValidForm()){
+  <!--  since each of our checkErrorFields is returning true isValidForm() will return true    -->
+  console.log("our form has some errors")
+  }
+  },
+  onError:(state,errors)=>{
+  <!-- MOCK: This is an example in destructuring our response coming from our request  -->
+  const {message} = errors?.[0]?.response?.data;
+   let fieldsWithErrors = {}
+  if(message.includes('field1')) fieldWithErrors = {...fieldWithErrors, field1: 'SERVER_ERROR_MSG1'}
+  if(message.includes('field2'))fieldWithErrors = {...fieldWithErrors, field2: 'SERVER_ERROR_MSG2'}
+  return fieldsWithErrors
+  }
+});
+
+return(
+  <form onSubmit={handleSubmit}>
+    <Input type="text" onChange={handlers.field1} value={state.field1} error={state.field1.error} errorMessage={state.field1.errorMessage}/>
+    <Input type="text" onChange={handlers.field2} value={state.field2} error={state.field2.error} errorMessage={state.field2.errorMessage}/>
+    <button type="submit">Submit</button>
+  </form>
+);
+```
+Then you can just simply, invoke your `handleError` helper in `catch`:
+```
+fetch('https://api.github.com/orgs/axios')
+  .then(response => response.json())    // one extra step
+  .then(data => {
+    console.log(data) 
+  })
+  .catch(handleErrors);
+```
+
+## Debounce Support.
+
+Summary: Debounce is used on `Text` inputs, where we dont want to  apply certain logic to each time the user interacts with the keyboard ( state- changing), so we only care about the user **FINAL**  input, so we can later on  apply that logic into a  **SINGLE** input instead of each **EACH** of the user input:
+You can read more here: https://lodash.com/docs/4.17.15#debounce
+
+- Disadvatanges:
+1. You can't use the `value` prop on inputs, this is because since it will take the latest input after the user has timeout - debounce, a dumb example can be:
+<br> 
+User types: H-E-L-L-O => If we use `debounce` & `value` prop we will only see the **O** on our input, since that was the latest input from user. Logic will be applied only to the **O** as well.
+
+2. If we dont care about each of the user interaction with the keyboard but only the **FINAL** and complete input of the user the best is to dismiss the `value` prop and use `debounce`.
+
+- Advantages:
+1. Since we can't use `value` prop let's put the following example without using `debounce`:
+User Types: H-E-L-L-O => If we use `debounce` we only will apply the logic to the final user input which is *HELLO*, so after timeout we will be getting our complete value in our  *state*.
+2. Since we only changed the state once, the re-renderings get to saved big-time as well callbacks being run on every keyboard interaction, in few words we increase performance in our user text - inputs.
+
+## How to use Debounce on useForm.
+
+```
+<!-- Logic gets applied after timeout -->
+const handleField2Change = (valueofField2)=>{
+<!-- JUST A SIMPLE LOGIC  -->
+  return valueOfField2.trim();
+}
+const {state,handlers,handleSubmit} = useForm({
+  fields:{
+    field1:{value:'Initial value for field1'}
+    <!-- Tells we can't use value prop in our text-input, to use debounce feature -->
+    field2: {value: '', onChange: handleField2Change, withoutInputValue: true }
+  }
+  onSubmit:(values)=>{
+    console.log(values)
+  <!-- You should still be seeing the state values for field1 and field2-->
+  }
+});
+
+return(
+  <form onSubmit={handleSubmit}>
+    <Input type="text" onChange={handlers.field1} value={state.field1}/>
+    <!-- SINCE WE ARE USING: withouInputValue prop in our field2 we cant have value prop in our field2 -->
+    <Input type="text" onChange={handlers.field2}/>
+    <button type="submit">Submit</button>
+  </form>
+)
+```
+
+1. `withoutInputValue`: Boolean flags that tells our `useForm` hook to use a `debounce` handler instead, default is `false`.
+2. If `withoutInputValue` is true keep in mind that you wont be able to use `value` prop in text inputs.
+
+## Questions ?
+
+Feel free to ping @Slack => Fernando Rivas.
+
+
+
