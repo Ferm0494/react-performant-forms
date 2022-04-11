@@ -3,7 +3,7 @@ import { debounce } from 'lodash';
 
 
 interface IParams {
-  checkFieldErrors?: (arg: any,state: IFields) => boolean;
+  checkFieldErrors?: (arg: any, state: IFields) => boolean;
   error?: boolean;
   errorMessage?: string,
   onBlur?: (arg: any) => any;
@@ -64,35 +64,35 @@ const useForm = (args: IArgs) => {
 
   const reducer = (reducerState: IFields, action: IAction): IFields => {
 
-    switch(action.type){
+    switch (action.type) {
       case IActions.CHANGE:
-        if(action.payload){
-        const { value } = action.payload;
-        const isTypeEvent = typeof value === 'object';
-        if (action.payload.onChange) {
-          const modifiedValue = action.payload.onChange(isTypeEvent ? value.target?.value : value, reducerState, isTypeEvent? value : undefined);
-          if (modifiedValue && typeof modifiedValue !== ICallbackParams.OBJECT) {
-            return { ...reducerState, [action.field]: { value: modifiedValue, error: false, errorMessage: errorMessages[action.field] } } as IFields;
-          } else if (modifiedValue && typeof modifiedValue === ICallbackParams.OBJECT) {
-            const modifiedState = modifiedValue;
-            let modifiedFields = {};
-            for (const prop in modifiedState) {
-              if (reducerState[prop]) {
-                modifiedFields = reducerState[prop].hasOwnProperty('error') ?
-                  { ...modifiedFields, [prop]: { ...reducerState[prop], value: modifiedState[prop], error: false, errorMessage: errorMessages[prop] } }
-                  :
-                  { ...modifiedFields, [prop]: { ...reducerState[prop], value: modifiedState[prop], errorMessage: errorMessages[prop] } };
+        if (action.payload) {
+          const { value } = action.payload;
+          const isTypeEvent = value?.target;
+          if (action.payload.onChange) {
+            const modifiedValue = action.payload.onChange(isTypeEvent ? value.target?.value : value, reducerState, isTypeEvent ? value : undefined);
+            if (modifiedValue && typeof modifiedValue !== ICallbackParams.OBJECT) {
+              return { ...reducerState, [action.field]: { value: modifiedValue, error: false, errorMessage: errorMessages[action.field] } } as IFields;
+            } else if (modifiedValue && typeof modifiedValue === ICallbackParams.OBJECT) {
+              const modifiedState = modifiedValue;
+              let modifiedFields = {};
+              for (const prop in modifiedState) {
+                if (reducerState[prop]) {
+                  modifiedFields = reducerState[prop].hasOwnProperty('error') ?
+                    { ...modifiedFields, [prop]: { ...reducerState[prop], value: modifiedState[prop], error: false, errorMessage: errorMessages[prop] } }
+                    :
+                    { ...modifiedFields, [prop]: { ...reducerState[prop], value: modifiedState[prop], errorMessage: errorMessages[prop] } };
+                }
               }
+              return { ...reducerState, ...modifiedFields };
             }
-            return { ...reducerState, ...modifiedFields };
           }
+          return reducerState[action.field].hasOwnProperty('error') ?
+            { ...reducerState, [action.field]: { ...reducerState[action.field], value: isTypeEvent ? value.target?.value : value, error: false, erroMessage: errorMessages[action.field] } } as IFields
+            :
+            { ...reducerState, [action.field]: { ...reducerState[action.field], value: isTypeEvent ? value.target?.value : value } } as IFields;
         }
-        return reducerState[action.field].hasOwnProperty('error') ?
-          { ...reducerState, [action.field]: { ...reducerState[action.field], value: isTypeEvent ? value.target?.value : value, error: false,erroMessage: errorMessages[action.field] } } as IFields
-          :
-          { ...reducerState, [action.field]: { ...reducerState[action.field], value: isTypeEvent ? value.target?.value : value } } as IFields;
-      }
-      return reducerState;
+        return reducerState;
       case IActions.ERROR:
         return {
           ...reducerState,
@@ -104,7 +104,7 @@ const useForm = (args: IArgs) => {
         };
 
       case IActions.REPLACE:
-        if(action.payload?.value && typeof action.payload.value === 'object'){
+        if (action.payload?.value && typeof action.payload.value === 'object') {
           let newState = { ...reducerState };
           const { value: values } = action.payload;
           // We only copy the values that we have in our reducerState initialized, however IParams remains the same.
@@ -115,7 +115,7 @@ const useForm = (args: IArgs) => {
           }
           return newState;
 
-        }else{
+        } else {
           return reducerState;
         }
       default:
@@ -165,7 +165,7 @@ const useForm = (args: IArgs) => {
                 type: IActions.CHANGE,
                 field: val,
                 payload: {
-                  value : e,
+                  value: e,
                   onChange: args.fields[val].onChange,
                 },
               });
@@ -180,39 +180,39 @@ const useForm = (args: IArgs) => {
   }, []);
 
   const validateForm =
-      () => {
-        let isValidForm = true;
-        for (const field in state) {
-          if (state[field].hasOwnProperty('error') &&
-              (!state[field].value || state[field].error)){
+    () => {
+      let isValidForm = true;
+      for (const field in state) {
+        if (state[field].hasOwnProperty('error') &&
+          (!state[field].value || state[field].error)) {
+          dispatch({
+            type: IActions.ERROR,
+            field,
+            payload: {
+              ...state[field],
+              error: true,
+              errorMessage: errorMessages[field],
+            },
+          });
+          isValidForm = false;
+        } else if (state[field].hasOwnProperty('error') && state[field].hasOwnProperty('checkFieldErrors')) {
+          const validateFieldsResponse = args.fields[field].checkFieldErrors?.(state[field].value, state);
+          if (validateFieldsResponse) {
             dispatch({
               type: IActions.ERROR,
               field,
               payload: {
-              ...state[field],
-              error: true,
-              errorMessage: errorMessages[field],
-              },
-            });
-            isValidForm = false;
-          }else if(state[field].hasOwnProperty('error') && state[field].hasOwnProperty('checkFieldErrors')){
-            const validateFieldsResponse = args.fields[field].checkFieldErrors?.(state[field].value,state);
-            if(validateFieldsResponse){
-              dispatch({
-                type: IActions.ERROR,
-                field,
-                payload: {
                 ...state[field],
                 error: true,
                 errorMessage: typeof validateFieldsResponse === 'string' ? validateFieldsResponse : errorMessages[field],
-                },
-              });
-              isValidForm = false;
-            }
+              },
+            });
+            isValidForm = false;
           }
         }
-        return isValidForm;
-      };
+      }
+      return isValidForm;
+    };
 
   const initBlurs = useCallback(() => {
     if (!blurs) {

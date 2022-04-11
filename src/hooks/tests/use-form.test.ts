@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react-hooks';
-import useForm from './'
+import useForm from '../useForm'
 const TEST_CHANGE = 'TEST-CHANGE';
 const mockMultipleFieldsChangeHandler = (state) => ({
   field1: 'Changing',
@@ -31,6 +31,9 @@ const initFields = () => ({
       error: false,
       errorMessage: DEFAULT_FIELD4_ERROR_MESSAGE,
     },
+    field5: {
+      value: '',
+    }
   },
   onSubmit: jest.fn(),
   onError: jest.fn(),
@@ -104,9 +107,9 @@ describe('use-form', () => {
     expect(result.current.state.field1.error).toBeTruthy();
   });
 
-  it('should put error flag to true & error_message key change with the returning value of checkFieldErrors, if checkFieldErrors field returns a string',()=>{
+  it('should put error flag to true & error_message key change with the returning value of checkFieldErrors, if checkFieldErrors field returns a string', () => {
     const MOCK_ERROR_MESSAGE = 'RANDOM_STRING'
-    const mockcheckFieldErrors = ()=> MOCK_ERROR_MESSAGE
+    const mockcheckFieldErrors = () => MOCK_ERROR_MESSAGE
     mockInputValues.fields.field1 = {
       ...mockInputValues.fields.field1,
       value: 'not-empty-str',
@@ -172,7 +175,7 @@ describe('use-form', () => {
     });
 
     expect(mockInputValues.onError).toHaveBeenCalledTimes(1);
-    expect(mockInputValues.onError.mock.calls[0]).toEqual([ result.current.state, [ extraParamMock ] ]);
+    expect(mockInputValues.onError.mock.calls[0]).toEqual([result.current.state, [extraParamMock]]);
   });
 
   it(
@@ -188,15 +191,47 @@ describe('use-form', () => {
       expect(result.current.state.field1.errorMessage).toEqual(NEW_ERROR_MESSAGE);
     },
   );
-  it('resetForm should be able to override field values with key-match',()=>{
-    const {result} = renderHook(()=>useForm(mockInputValues));
+  it('resetForm should be able to override field values with key-match', () => {
+    const { result } = renderHook(() => useForm(mockInputValues));
     const mockMsg = 'TESTING-FIELD-VALUE'
-    act(()=>{
+    act(() => {
       result.current.replaceForm({
-          ...result.current.state,
-          field1: mockMsg,
+        ...result.current.state,
+        field1: mockMsg,
       });
     });
     expect(result.current.state.field1.value).toEqual(mockMsg);
+  });
+
+  it('should put whole object in state if its not Event Type and handler not defined handler', () => {
+    const { result } = renderHook(() => useForm(mockInputValues));
+    const mockObject = {
+      prop1: 'somerandomstuff',
+      prop2: 'good stuff'
+    };
+
+    act(() => {
+      result.current.handlers.field5(mockObject);
+    });
+
+    expect(result.current.state.field5.value).toEqual(mockObject);
+  });
+
+  it('should put the value of the Event Type instead of the Event Type as state value', () => {
+    const { result } = renderHook(() => useForm(mockInputValues));
+    const mockObject = {
+      target: {
+        value: 'something'
+      }
+    };
+
+    act(() => {
+      result.current.handlers.field5(mockObject);
+    });
+
+    expect(result.current.state.field5.value).toEqual(mockObject.target.value);
+
   })
 });
+
+
