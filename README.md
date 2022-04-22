@@ -61,8 +61,8 @@ return(
 <br>
 - The short answer is **no**, since in some cases we need access to the state form values, and since this is the case... we must include the depending fields that we are going to use in our dependency array in our `useCallback()`, so we get back to the previous point where we get if one of our field in our dependency changes... the callback will be recreated, and again it will re-render whenever this callback is being used. Disregarding if your input changed or not.
 
-# How to solve it with useHook ?
-- Pretty much the idea of the useHook is to summarize form actions which involves:
+# How to solve it with useForm hook ?
+- Pretty much the idea of the useForm is to summarize form actions which involves:
 1. Change Handlers being summarized as memoized dispatchers ( So we can use `memo` )
 2. Field Values.
 3. Error Handlers
@@ -256,7 +256,7 @@ return(
 
 NOTE: IMPORTANT Once we show the returning string of `checkFieldErrors` once we change the value of that field via our `handler` , `errorMessage` will have the value we initialized it.
 
-## Sever Errors
+## Server Errors
 - We normally want to check if our server is returning a valid request or not, is our request is invalid based on server validation and we want to display which fields failed we can do that with our helper: `onError`
 
 ```
