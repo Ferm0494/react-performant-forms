@@ -1,6 +1,6 @@
 {
   "name": "react-performant-forms",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": false,
   "author": "Ferm0494",
   "keywords": [
@@ -9,11 +9,13 @@
     "rerenderings",
     "many-form-inputs",
     "performant-inputs",
-    "form-state-handler"
+    "form-state-handler",
+    "form-react-hooks",
+    "general-react-hooks"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ferm0494/ferm-forms.git"
+    "url": "git+https://github.com/Ferm0494/react-peformant-forms.git"
   },
   "dependencies": {
     "lodash": "^4.17.21",
@@ -73,7 +75,7 @@
     "react-test-renderer": "^16.13.1",
     "rollup": "^1.29.0",
     "rollup-plugin-sass": "^1.2.2",
-    "rollup-plugin-typescript2": "^0.25.3",
+    "rollup-plugin-typescript2": "^0.30.0",
     "rollup-plugin-uglify": "^6.0.4",
     "ts-jest": "^26.1.3",
     "typescript": "^4.4.2"
