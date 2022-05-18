@@ -50,7 +50,8 @@
     "react-dom": ">= 16.8.0"
   },
   "devDependencies": {
-
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.2.0",
     "@testing-library/react-hooks": "^3.4.1",
     "@types/jest": "^26.0.7",
     "@types/lodash": "^4.14.180",
