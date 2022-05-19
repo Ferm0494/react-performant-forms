@@ -1,6 +1,6 @@
 {
   "name": "react-performant-forms",
-  "version": "1.2.35",
+  "version": "1.2.36",
   "private": false,
   "author": "Ferm0494",
   "keywords": [
@@ -14,7 +14,12 @@
     "general-react-hooks",
     "paginated-scroll",
     "scroll-pagination",
-    "react-hooks"
+    "react-hooks",
+    "react-performant-forms",
+    "react performant forms",
+    "react forms",
+    "react form hooks",
+    "scroll pagination hook"
   ],
   "repository": {
     "type": "git",
