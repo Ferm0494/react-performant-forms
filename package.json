@@ -1,6 +1,6 @@
 {
   "name": "react-performant-forms",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "private": false,
   "author": "Ferm0494",
   "keywords": [
@@ -11,7 +11,9 @@
     "performant-inputs",
     "form-state-handler",
     "form-react-hooks",
-    "general-react-hooks"
+    "general-react-hooks",
+    "paginated-scroll",
+    "scroll-pagination"
   ],
   "repository": {
     "type": "git",
