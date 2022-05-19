@@ -11,7 +11,7 @@
   - Submission & validation.
   - Debounce support and much more!
 
-- [usePaginatedScroll](https://github.com/Ferm0494/react-peformant-forms/blob/main/docs/usePaginatedScroll.md)
+- [usePaginatedScroll](https://github.com/Ferm0494/react-peformant-forms/blob/main/docs/usePaginatedScroll.md):
   - Keep data, pagination and loading state within a paginated scrollable container.
 
 
