@@ -8,7 +8,7 @@ This hook is created to control inputs in a parent component, with less code boi
 <br>
 <br>
 **Example:**
-```
+```js
 const [form,setForm] = useState({
   field1: '',
   field2: ''
@@ -72,10 +72,10 @@ return(
 7. Error Flags.
 8. Error Messages
 
-# How to use it ?
+## How to use it ?
 
 - Declare the hook and the fields you are going to use in your **form** it can be any type for this case Im going to use text fields.
-```
+```js
 const {state,handlers,handleSubmit} = useForm({
   fields:{
     field1:{value:'Initial value for field1'}
@@ -102,7 +102,7 @@ Thats it, you created a simple form in a single *JSON* and the good thing is tha
 
 - We can add a custom handler to handle logic into our field for example any transformation or pasing that it may need, it can surely be added with the key *onChange* in our respective field prop we are interested, once we are done with the logic it's just simple enough to *return* it to set into the inner state of our *useForm hook*.
 
-```
+```js
 const handleField2Change = (valueofField2)=>{
 <!-- JUST A SIMPLE LOGIC  -->
   return valueOfField2.trim();
@@ -131,7 +131,7 @@ return(
 Cant I just simply use the *state* prop from `useForm` ? Short answer: *NO* ,since they are memoized, you will only get the field fresh to the connected handler, however the rest will remain to their **initial state** .
 
 ## SOLUTION: 
-```
+```js
 const handleField2Change = (field2Value,state)=>{
 const {field2,field1} = state
 <!-- field2 and field here we get our current states for field1 && field2 -->
@@ -146,7 +146,7 @@ Let's say you want to return a new state for your field1 based on field2 as well
 
 ## SOLUTION:
 
-```
+```js
 const handleField2Change = (field2Value,state)=>{
   const {field2,field1} = state;
   return{field1: field2, field2: field2Value}
@@ -158,7 +158,7 @@ By just returning an object with the corresponding keys, the `useForm` hook will
 IMPORTANT: Keep in mind that those keys needs to be defined in our `fields` prop in our `useForm` hook, the reason for this is to not add thrash and keep our form well defined from the beginning.
 
 # Controlling Events in our Handler:
-```
+```js
 const handleField2Change = (field2Value,state,event)=>{
 .
 .
@@ -170,7 +170,7 @@ const handleField2Change = (field2Value,state,event)=>{
 
 We can handle errors and validations within our `JSON` config `useForm`,
 ## Getting started 
-```
+```js
 const {state,handleSubmit} = useForm({
   fields:{
     field1:{value:'Initial value for field1',error: false, errorMessage: 'SOME_DEFAULT_ERROR_MESSAGE_FIELD1'}
@@ -195,7 +195,7 @@ return(
 
 ## Triggering Errors and Changing Error Messages in our Fields.
 - Triggering Error Fields:
-```
+```js
 const {state,handlers,isValidForm,handleSubmit} = useForm({
   fields:{
     field1:{value:'Initial value for field1',error: false, errorMessage: 'SOME_DEFAULT_ERROR_MESSAGE_FIELD1',checkFieldErrors: ()=> true}
@@ -227,7 +227,7 @@ NOTE: Please keep in mind that `error` prop is attached to the `checkFieldErrors
 
 - Changing Default Error Messages within our Fields:
 
-```
+```js
 const {state,handlers,isValidForm,handleSubmit} = useForm({
   fields:{
     field1:{value:'Initial value for field1',error: false, errorMessage: 'SOME_DEFAULT_ERROR_MESSAGE_FIELD1',checkFieldErrors: ()=> 'INVALID_MSG1'}
@@ -259,7 +259,7 @@ NOTE: IMPORTANT Once we show the returning string of `checkFieldErrors` once we 
 ## Server Errors
 - We normally want to check if our server is returning a valid request or not, is our request is invalid based on server validation and we want to display which fields failed we can do that with our helper: `onError`
 
-```
+```js
 const {state,handlers,isValidForm,handleSubmit,handleErrors} = useForm({
   fields:{
     field1:{value:'Initial value for field1',error: false, errorMessage: 'SOME_DEFAULT_ERROR_MESSAGE_FIELD1',checkFieldErrors: ()=> 'INVALID_MSG1'}
@@ -293,7 +293,7 @@ return(
 );
 ```
 Then you can just simply, invoke your `handleError` helper in `catch`:
-```
+```js
 fetch('https://api.github.com/orgs/axios')
   .then(response => response.json())    // one extra step
   .then(data => {
@@ -321,7 +321,7 @@ User Types: H-E-L-L-O => If we use `debounce` we only will apply the logic to th
 
 ## How to use Debounce on useForm.
 
-```
+```js
 <!-- Logic gets applied after timeout -->
 const handleField2Change = (valueofField2)=>{
 <!-- JUST A SIMPLE LOGIC  -->
