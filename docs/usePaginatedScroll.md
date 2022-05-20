@@ -26,7 +26,7 @@ const TEXT =
 /* This is a Mocking promise that resolves TEXT constant */
 const getData = async () => {
   return new Promise((resolve, reject) => {
-    setTimeout(resolve, 3000, TEXT);
+    setTimeout(resolve, 3000, [TEXT]);
   });
 };
 
