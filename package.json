@@ -1,8 +1,9 @@
 {
   "name": "react-performant-forms",
-  "version": "1.2.37",
+  "version": "1.2.38",
   "private": false,
   "author": "Ferm0494",
+  "license": "MIT",
   "keywords": [
     "react",
     "react-forms",
@@ -19,7 +20,9 @@
     "react performant forms",
     "react forms",
     "react form hooks",
-    "scroll pagination hook"
+    "scroll pagination hook",
+    "useResponsive",
+    "useResponsive hook"
   ],
   "repository": {
     "type": "git",
