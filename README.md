@@ -14,5 +14,9 @@
 - [usePaginatedScroll](https://github.com/Ferm0494/react-peformant-forms/blob/main/docs/usePaginatedScroll.md):
   - Keep data, pagination and loading state within a paginated scrollable container.
 
+- [useResponsive](https://github.com/Ferm0494/react-peformant-forms/blob/main/docs/useResponsive.md)
+    - Keep track of your screen-width resolutions with attached-event-listener.
+    - Ability remove resizing listener for one time resolution.
+    - Ability to set your own breaking points.
 
 
