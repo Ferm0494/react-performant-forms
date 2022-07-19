@@ -65,7 +65,7 @@ const {
 }
 ```
 ### Arguments :
-1. `getData` (Mandatory): `getData()` is a Promise that resolves an **Array** of new Data to be appended into our existing data.
+1. `getData` (Mandatory): `getData(currentPage: number)` is a Promise that resolves an **Array** of new Data to be appended into our existing data.
 2. `initialCounter`: Initial value of where does your pagination starts.**Default value is 1**.
 3. `initialData`: Initial Data as an Array. **Default Value is an empty array**.
 4. `offSet`: This argument applies when `getData` was rejected useful for errors to scroll up and dismiss the loading state. Defines how much the scroll should go up
