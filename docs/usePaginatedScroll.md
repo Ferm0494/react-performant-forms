@@ -23,8 +23,14 @@ const TEXT =
   amus vestibulum quam ut fringilla auctor. Curabitur semper molestie arcu, vel sol
   licitudin magna tempus id,liquet, ornare tellus a";
 
-/* This is a Mocking promise that resolves TEXT constant */
-const getData = async () => {
+/* This is a Mocking promise that resolves TEXT constant
+  Arguments:
+  - page: is the current page counter, it starts at 1.
+  If succcessful promise resolve it increments, else it remains the same.
+
+*/
+
+const getData = async (page) => {
   return new Promise((resolve, reject) => {
     setTimeout(resolve, 3000, [TEXT]);
   });

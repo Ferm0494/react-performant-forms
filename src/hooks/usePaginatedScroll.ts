@@ -23,7 +23,7 @@ type Threshold =
 
 interface IProps {
   initialCounter?: number;
-  getData: () => Promise<unknown[]>;
+  getData: (page: number) => Promise<unknown[]>;
   initialData?: unknown[];
   offSet?: Threshold;
 }
@@ -50,7 +50,7 @@ const usePaginatedScroll = ({
         !loading
       ) {
         setLoading(true);
-        getData()
+        getData(counter)
         .then((newData) => {
           setError(false)
           setData([...data, ...newData]);
