@@ -25,12 +25,12 @@ const TEXT =
 
 /* This is a Mocking promise that resolves TEXT constant
   Arguments:
-  - page: is the current page counter, it starts at 1.
+  - currentPage: is the current page counter, it starts at 1.
   If succcessful promise resolve it increments, else it remains the same.
 
 */
 
-const getData = async (page) => {
+const getData = async (curentPage) => {
   return new Promise((resolve, reject) => {
     setTimeout(resolve, 3000, [TEXT]);
   });
